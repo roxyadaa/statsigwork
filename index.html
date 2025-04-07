@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Landing Page with Statsig</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1c2c, #4a1942);
+            min-height: 100vh;
+            color: white;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 80vh;
+            gap: 2rem;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(to right, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+            margin-top: 2rem;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            color: #4ecdc4;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>Welcome to Our Platform</h1>
+            <p>Experience the future of digital innovation with our cutting-edge solutions powered by Statsig analytics.</p>
+            <a href="#features" class="cta-button" id="explore-features">Explore Features</a>
+        </div>
+
+        <div class="features" id="features">
+            <div class="feature-card">
+                <h3>Smart Analytics</h3>
+                <p>Gain deep insights into user behavior and make data-driven decisions.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Real-time Tracking</h3>
+                <p>Monitor user interactions and performance metrics in real-time.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Easy Integration</h3>
+                <p>Seamless integration with your existing workflow and tools.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Statsig SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@statsig/js-client@3/build/statsig-js-client+session-replay+web-analytics.min.js"></script>
+    
+    <!-- Statsig Integration -->
+    <script>
+        // Function to set up event handlers
+        function setupEventHandlers(client) {
+            console.log('Setting up event handlers...');
+            
+            // Track page view
+            client.logEvent('page_view', {
+                page: 'landing_page',
+                timestamp: new Date().toISOString()
+            });
+
+            // Add click event listener to CTA button
+            document.getElementById('explore-features').addEventListener('click', () => {
+                client.logEvent('cta_button_click', {
+                    button_name: 'explore_features',
+                    location: 'hero_section'
+                });
+            });
+
+            // Track feature card interactions
+            document.querySelectorAll('.feature-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    client.logEvent('feature_card_hover', {
+                        card_title: card.querySelector('h3').textContent
+                    });
+                });
+            });
+        }
+
+        // Initialize Statsig when the window loads
+        window.onload = async function() {
+            try {
+                console.log('Window loaded, initializing Statsig...');
+                
+                const { StatsigClient, runStatsigAutoCapture, runStatsigSessionReplay } = window.Statsig;
+                
+                const client = new StatsigClient(
+                    'client-uYspSuX83wAv4zohVqdfSLEKSsh7uxvQxLJplNiO97N',
+                    { 
+                        userID: 'test-user-' + Date.now(),
+                        environment: { tier: 'development' }
+                    }
+                );
+
+                // Enable auto-capture and session replay
+                runStatsigSessionReplay(client);
+                runStatsigAutoCapture(client);
+
+                // Initialize the client
+                await client.initializeAsync();
+                console.log('Statsig initialized successfully');
+                
+                // Set up event handlers
+                setupEventHandlers(client);
+            } catch (error) {
+                console.error('Failed to initialize Statsig:', error);
+            }
+        };
+    </script>
+    </script>
+</body>
+</html>
