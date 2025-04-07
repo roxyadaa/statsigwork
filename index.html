@@ -157,11 +157,11 @@
                 console.log('Window loaded, initializing Statsig...');
                 
                 const { StatsigClient, runStatsigAutoCapture, runStatsigSessionReplay } = window.Statsig;
-                
+                const randomID = 'test-techno-' + Math.random().toString(36).substring(2, 10);
                 const client = new StatsigClient(
                     'client-5slPBpPqIhLhQdvyTALwCFeiozpopD0hs4ozHUjicaE',
                     { 
-                        userID: 'test-user-' + Date.now(),
+                        userID: randomID,
                         environment: { tier: 'development' }
                     }
                 );
